@@ -1,0 +1,54 @@
+[% USE HTML %]
+<body>
+<style type="text/css">
+  <!--
+.top_border {
+  border-top: solid black;
+  border-width: 4px;
+}
+.bottom_border {
+  border-bottom: solid black;
+  border-width: 4px;
+}
+</style>
+<div class="listtop" style="margin-bottom: 10px">[% TITLE %]</div>
+<form method="post" action="auction.pl">
+<table width="100%">
+<tr>
+     <th colspan="2" align="left" class="listheading">eBay Account</td>
+</tr>
+<tr>
+     <td align="left" width="150px">Username:</td>
+     <td><input name="account.username" size="42" maxlength="255" value="[% USERNAME %]"></td>
+</tr>
+<tr>
+     <th colspan="2" align="left" class="listheading">Generate Authentication Token - (Is valid for 18 month)</td>
+</tr>
+<tr>
+     <td align="left">Timestamp:</td>
+     <td>[% TIMESTAMP %]</td>
+</tr>
+<tr>
+     <td align="left">Session ID:</td>
+     <td>[% SESSION_ID %]</td>
+</tr>
+<tr>
+     <td align="left" valign="top">Authentication Token:</td>
+     <td><textarea name="account.auth_token" readonly cols="120" rows="10">[% AUTH_TOKEN %]</textarea></td>
+</tr>
+<tr>
+     <td align="left">Expires:</td>
+     <td>[% HARD_EXPIRATION_TIME %]</td>
+</tr>
+<tr><td colspan="2"><hr size="3" noshade></td></tr>
+</table>
+<input type="hidden" name="session_id" value="[% SESSION_ID %]">
+<input type="hidden" name="account.id" value="0">
+<input type="hidden" name="account.platform" value="0">
+<input type="hidden" name="account.hard_expiration_time" value="[% HARD_EXPIRATION_TIME %]">
+<input type="hidden" name="action" value="dispatcher">
+<input type="submit" name="action_save_account" value="Save">&nbsp;
+<input type="submit" name="action_authorize_account" value="Launch Auth & Auth" onclick="window.open('https://signin.ebay.com/ws/eBayISAPI.dll?SignIn&runame=Webblazer-Webblaze-42c3-4-zzmyrwad&SessID=[% SESSION_ID %]');">
+</form>
+</body>
+</html>

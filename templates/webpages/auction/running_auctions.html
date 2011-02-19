@@ -1,0 +1,80 @@
+[% USE HTML %]
+<body>
+<style type="text/css">
+  <!--
+.top_border {
+  border-top: solid black;
+  border-width: 4px;
+}
+.bottom_border {
+  border-bottom: solid black;
+  border-width: 4px;
+}
+.note {
+  background-color: rgb(255, 255, 204);
+  border: 1px dotted rgb(0, 0, 0);
+  font-family: Verdana;
+  font-size: x-small;
+  margin-top: 10px;
+  overflow: hidden;
+  padding: 0px;
+  position: relative;
+  z-index: 2;
+  width:90%;	
+}
+
+    -->
+</style>
+
+<div class="listtop" width="100%">[% TITLE %]</div>
+<table width="100%">
+<tr>
+     <th class="listheading">Image</th>
+     <th class="listheading">Auction</th>
+     <th class="listheading">Time</th>
+     <th class="listheading">Current Bid(s)</th>
+     <th class="listheading">Bidder(s)</th>
+     <th class="listheading">Actions</th>
+</tr>
+[%- FOREACH auction = AUCTIONS %]
+<tr valign="top">
+<td align="center" width="100"><img src="[% auction.image_url %]"></td>
+
+<td>
+<h2>[% auction.title %]</h2>
+<p class="note">[% auction.private_notes %]</p>
+Auction ID: <a href="[% auction.item_url %] " target="_blank">[% auction.id %]</a><br /><br/> 
+</td>
+
+<td>
+Time Left: [% auction.time_left %]<br />
+Start Date: [% auction.start_date %]<br />
+End Date: [% auction.end_date %]<br />
+</td>
+
+<td>
+Current Price: [% auction.current_price %]<br />
+Start Price: [% auction.start_price %]<br />
+But-It Now: [% auction.buy_it_now_price %]<br />
+Shipping Price: [% auction.shipping_price %]<br />
+</td>
+
+<td>
+Highest Bidder: <a href="http://members.ebay.com/ws/eBayISAPI.dll?ViewUserPage&userid=[% auction.bidder %]" target="_blank">[% auction.bidder %]</a> ([% auction.feedback_score %])<br />
+
+</td>
+
+<td>
+<form method="post" name="auction" action="auction.pl">
+ 	<input class="submit" type="submit" name="action" id="invoice_button" value="Write Invoice">
+ 	<input type="hidden" name="id" value="[% auction.id %]">
+</form>
+</td>
+</tr>
+[%- END %]
+<tr><td colspan="6"><div width="100%"><h2>[% MESSAGE %]</h2></div><hr size="3" noshade></td></tr>
+</table>
+</body>
+</html>
+
+

@@ -1,0 +1,25 @@
+[% USE HTML %]
+<body>
+<style type="text/css">
+  <!--
+.top_border {
+  border-top: solid black;
+  border-width: 4px;
+}
+.bottom_border {
+  border-bottom: solid black;
+  border-width: 4px;
+}
+</style>
+<div class="listtop" style="margin-bottom: 10px">[% TITLE %]</div>
+<form method="post" action="auction.pl">
+<p>
+When you finish the ebay authentication, you need to fetch the token and store it in the database. To do this just push the button below. The Token is then valid for 18 month. During that time you do not need to create a new token and can use LX-Office with ebay. 
+</p>
+<hr size="3" noshade>
+<input type="hidden" name="action" value="dispatcher">
+<input type="hidden" name="session_id" value="[% SESSION_ID %]">
+<input type="submit" name="action_fetch_auth_token" value="Fetch Token & Save">
+</form>
+</body>
+</html>

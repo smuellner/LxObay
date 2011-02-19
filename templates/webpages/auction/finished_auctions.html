@@ -1,0 +1,119 @@
+
+[% USE HTML %]
+<body>
+<style type="text/css">
+  <!--
+.top_border {
+  border-top: solid black;
+  border-width: 4px;
+}
+.bottom_border {
+  border-bottom: solid black;
+  border-width: 4px;
+}
+.note {
+  background-color: rgb(255, 255, 204);
+  border: 1px dotted rgb(0, 0, 0);
+  font-family: Verdana;
+  font-size: x-small;
+  margin-top: 10px;
+  overflow: hidden;
+  padding: 0px;
+  position: relative;
+  z-index: 2;
+  width:90%;	
+}
+
+    -->
+</style>
+
+<div class="listtop" width="100%">[% TITLE %]</div>
+<table width="100%">
+<tr>
+     <th class="listheading">Image</th>
+     <th class="listheading">Auction</th>
+     <th class="listheading">Time</th>
+     <th class="listheading">Conditions</th>
+     <th class="listheading">Buyer</th>
+     <th class="listheading">Actions</th>
+</tr>
+[%- FOREACH auction = AUCTIONS %]
+<tr valign="top">
+<td align="center" width="100"><img src="[% auction.image_url %]" width="128" height="128" alt="[% auction.title %]" /></td>
+
+<td>
+<h2>[% auction.title %]</h2>
+<p class="note">[% auction.private_notes %]</p>
+Auction ID: <a href="[% auction.item_url %] " target="_blank">[% auction.id %]</a><br /><br/> 
+</td>
+
+<td>
+Paid Time: [% auction.paid_time_str %]<br />
+Shipped Time:  [% auction.shipped_time_str %]<br />
+Start Date: [% auction.start_date_str %]<br />
+</td>
+
+<td>
+Paid Price: [% auction.transaction_price %]<br />
+Start Price: [% auction.start_price %]<br />
+Shipping Price: [% auction.shipping_price %]<br />
+Quantity:  [% auction.quantity_purchased %]<br />
+</td>
+
+<td>
+Buyer: <a href="http://members.ebay.com/ws/eBayISAPI.dll?ViewUserPage&userid=[% auction.buyer_user_id %]" target="_blank">[% auction.buyer_user_id %]</a> ([% auction.buyer_feedback_score %])<br />
+<a href="mailto:[% auction.buyer_email %]" target="_blank">[% auction.buyer_email %]</a><br />
+Name: [% auction.buyer_name %]<br />
+Street 1: [% auction.buyer_street_1 %]<br />
+Street 2: [% auction.buyer_street_2 %]<br />
+Street 3: [% auction.buyer_street_3 %]<br />
+City: [% auction.buyer_postal_code %] [% auction.buyer_city %]<br />
+Country: [% auction.buyer_country %]
+<form method="post" name="ct" action="ct.pl">
+        <input name="callback" type="hidden" value="[% HTML.escape(callback) %]">
+        <input name="db" type="hidden" value="customer">
+        <input name="email" type="hidden" value="[% HTML.escape(auction.buyer_email) %]">
+        <input class="submit" type="submit" name="action" id="customer_search_button" value="Search">
+</form>
+<form method="post" name="ct" action="ct.pl">
+        <input name="callback" type="hidden" value="[% HTML.escape(callback) %]">
+        <input name="db" type="hidden" value="customer">
+        <input name="name" type="hidden" value="[% HTML.escape(auction.buyer_name) %]">
+        <input name="email" type="hidden" value="[% HTML.escape(auction.buyer_email) %]">
+        <input name="phone" type="hidden" value="[% HTML.escape(auction.buyer_phone) %]">
+        <input name="street" type="hidden" value="[% HTML.escape(auction.buyer_street) %]">
+        <input name="zipcode" type="hidden" value="[% HTML.escape(auction.buyer_postal_code) %]">
+        <input name="city" type="hidden" value="[% HTML.escape(auction.buyer_city) %]">
+        <input name="country" type="hidden" value="[% HTML.escape(auction.buyer_country) %]">
+        <input name="contact" type="hidden" value="[% HTML.escape(auction.buyer_name) %]">
+        <input name="shiptostreet" type="hidden" value="[% HTML.escape(auction.buyer_street) %]">
+        <input name="shiptozipcode" type="hidden" value="[% HTML.escape(auction.buyer_postal_code) %]">
+        <input name="shiptocity" type="hidden" value="[% HTML.escape(auction.buyer_city) %]">
+        <input name="shiptocountry" type="hidden" value="[% HTML.escape(auction.buyer_country) %]">
+        <input name="shiptocontact" type="hidden" value="[% HTML.escape(auction.buyer_name) %]">
+        <input name="notes" type="hidden" value="ebayID: [% auction.buyer_user_id %]">
+        <!-- shortcuts special for ledq -->
+        <input name="business" type="hidden" value="1528">
+        <input name="language_id" type="hidden" value="911">
+        <input name="payment_id" type="hidden" value="1351">
+        <input name="klass" type="hidden" value="1539">
+        <input name="salesman_id" type="hidden" value="861">
+        <input name="taxzone_id" type="hidden" value="0">
+        <input class="submit" type="submit" name="action" id="customer_add_button" value="Add">
+</form>
+</td>
+
+<td>
+<form method="post" name="auction" action="auction.pl">
+ 	<input class="submit" type="submit" name="action" id="invoice_button" value="Write Invoice">
+ 	<input type="hidden" name="id" value="[% auction.id %]">
+</form>
+</td>
+</tr>
+[%- END %]
+<tr><td colspan="6"><div width="100%"><h2>[% MESSAGE %]</h2></div><hr size="3" noshade></td></tr>
+</table>
+</body>
+</html>
+
+
