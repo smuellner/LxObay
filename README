@@ -20,7 +20,7 @@ INSTALL LxObay
 	
 	svn co http://ebay-api-simple.googlecode.com/svn/trunk/lib/eBay eBay -r 40
 
-- Then copy the authentication class "auth.pm" from the LxObay dist to your newly checked out ebay-api-simple folder
+- Then copy the authentication class "auth.pm" from the LxObay distribution to your newly checked out ebay-api-simple folder
    	
 	cp LxObay/eBay/API/Simple/Auth.pm Lx-Office/eBay/API/Simple/Auth.pm
 
@@ -36,5 +36,14 @@ INSTALL LxObay
 	cpan Time::Local
 	cpan Data::Dumper
 
+3) Then finally add the necessary tables in your database using the:
 
+	update.sql
+
+file from the LxObay distribution. Do not miss to set the user rights for the tables:
+
+REVOKE ALL ON TABLE auction_accounts FROM <YourDBUser>;
+GRANT ALL ON TABLE auction_accounts TO <YourDBUser>;
+REVOKE ALL ON TABLE auction_data FROM <YourDBUser>;
+GRANT ALL ON TABLE auction_data TO <YourDBUser>;
 
