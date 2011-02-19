@@ -1,0 +1,40 @@
+REQUIREMENTS
+- Current version of LxObay
+- ebay-api-simple by Tim Keefer
+- HTTP::Request, HTTP::Headers, XML::Simple, URI::Escape, Date::Parse, Date::Format, Date::Language, Time::Local, Data::Dumper 
+
+INSTALL LxObay
+
+1) Basic Install
+- copy the folders and files:
+        * bin
+	* SL
+        * templates
+        * auction.pl
+	* ebay.ini
+  to the root of your Lx-Office Installation
+- then open the menu.ini from your Lx-Office Installation and add the additional lines from the LxObay menu.ini in the appropriate places
+
+2) Resolve Dependencies
+- In your root Lx-Office Folder, checkout the build revision 40 of "ebay-api-simple" from Google Code:
+	
+	svn co http://ebay-api-simple.googlecode.com/svn/trunk/lib/eBay eBay -r 40
+
+- Then copy the authentication class "auth.pm" from the LxObay dist to your newly checked out ebay-api-simple folder
+   	
+	cp LxObay/eBay/API/Simple/Auth.pm Lx-Office/eBay/API/Simple/Auth.pm
+
+- The rest of the missing dependencies can be simply installed from CPAN
+
+	cpan HTTP::Request
+	cpan HTTP::Headers
+	cpan XML::Simple
+	cpan URI::Escape
+	cpan Date::Parse
+	cpan Date::Format
+	cpan Date::Language
+	cpan Time::Local
+	cpan Data::Dumper
+
+
+
