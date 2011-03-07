@@ -40,6 +40,9 @@ use Time::Local;
 
 use SL::Form;
 use SL::User;
+use SL::Common;
+use SL::DBUtils;
+use SL::MoreCommon;
 
 use SL::AM;
 use SL::CT;
@@ -79,11 +82,20 @@ use strict;
 # --------------------------------------------------------------------
 # Auctions
 # --------------------------------------------------------------------
+our $account;    
 
 sub char_encode {
-   my($inString) = @_;
-   my $outString = decode("iso-8859-1", $inString); 
-   return $outString;
+ my($inString) = @_;
+ my $outString;
+ eval {
+    $outString = decode("iso-8859-1", $inString);
+    1;
+ } or do {
+    $main::lxdebug->message("EXCEPTION: " . $@);
+    print("EXCEPTION: " . $@ . "\ninString:" . $inString);
+    $outString = $inString;
+  };
+  return $outString;
 }
 
 sub timestamp_str {
@@ -120,17 +132,20 @@ sub alltrim($){
 sub running_auctions {
 
   $main::lxdebug->enter_sub();
-  # $main::auth->assert('running_auctions');
+#  $main::auth->assert('running_auctions');
 
   my $form     = $main::form;
   my %myconfig = %main::myconfig;
   my $locale   = $main::locale;
 
-  my $account = SL::AuctionAccount->retrieve('id' => 0);
-  
   my $username;
   my $auth_token;
   my $hard_expiration_time;
+
+  if(!$account) {
+          $account = SL::AuctionAccount->retrieve('id' => 0);
+  }
+  
   if($account && $account->{username} && $account->{auth_token}) {
         # get data
         $username = $account->{username};
@@ -189,7 +204,7 @@ sub running_auctions {
   my $totalNumberOfEntries;
   my $totalNumberOfPages;
   foreach my $p ( @pagination ) {
-  	# print "\n<code>" . $p->toString() . "</code>\n\n";
+        $main::lxdebug->message("PAGINATION " . $p->toString());
   	$totalNumberOfPages	= $p->findvalue('TotalNumberOfPages/text()');
   	$totalNumberOfEntries	= $p->findvalue('TotalNumberOfEntries/text()');
   }
@@ -201,7 +216,7 @@ sub running_auctions {
   	);
 	my $cnt = 0;
   	foreach my $n ( @nodes ) {
-    		# print "\n<code>" . $n->toString() . "</code>\n\n";
+               $main::lxdebug->message("NODE " . $n->toString());
     		# create row data
     		my %auction;  # get a fresh hash for the row data
 		
@@ -283,7 +298,7 @@ sub running_auctions {
 		}
 		$cnt++;
   	}
-
+        $main::lxdebug->message("CREATE FORM");
   	$form->{title} = $locale->text('Running Auctions') . "&nbsp\;" . $call->nodeContent( 'timestamp' ) . "&nbsp\;<div align=right>#" . $call->nodeContent( 'totalEntries' ) . "</div>";
   	$form->header();
   	print $form->parse_html_template("auction/running_auctions", { "TITLE" => $form->{title}, "AUCTIONS" => \@auctions });
@@ -300,18 +315,21 @@ sub running_auctions {
 
 sub finished_auctions {
 
-  $main::lxdebug->enter_sub();
-  # $main::auth->assert('finished_auctions');
+  $main::lxdebug->enter_sub(1);
+#  $main::auth->assert('finished_auctions');
 
   my $form     = $main::form;
   my %myconfig = %main::myconfig;
   my $locale   = $main::locale;
 
-  my $account = SL::AuctionAccount->retrieve('id' => 0);
-  
   my $username;
   my $auth_token;
   my $hard_expiration_time;
+
+  eval {                          # try
+  if(!$account) {
+	$account = SL::AuctionAccount->retrieve('id' => 0);
+  }
   if($account && $account->{username} && $account->{auth_token}) {
         # get data
         $username = $account->{username};
@@ -359,19 +377,21 @@ sub finished_auctions {
   my $totalNumberOfEntries;
   my $totalNumberOfPages;
   foreach my $p ( @pagination ) {
-  	# print "\n<code>" . $p->toString() . "</code>\n\n";
+        $main::lxdebug->message("PAGINATION " . $p->toString());
   	$totalNumberOfPages		= $p->findvalue('TotalNumberOfPages/text()');
   	$totalNumberOfEntries	= $p->findvalue('TotalNumberOfEntries/text()');
   }
 
   if($totalNumberOfEntries >= 1) {
+        $main::lxdebug->enter_sub(2);
   	my @auctions = ();  # initialize an array to hold your loop
   	my @nodes = $dom->findnodes(
     	  '//Transaction'
   	);
 	my $cnt = 0;
   	foreach my $n ( @nodes ) {
-    		# print "\n<code>" . $n->toString() . "</code>\n\n";
+		# print($n->toString());
+	        $main::lxdebug->message("NODE " . $n->toString());
     		# create row data
     		my %auction;  # get a fresh hash for the row data
 
@@ -476,7 +496,9 @@ sub finished_auctions {
 		}
 
 		$auction{image_url} = &ebay_gallery_url($auction{id});
-
+                if(!$auction{image_url}) {
+			$auction{image_url} = "http://";
+		}
      		# the crucial step - push a reference to this row into the loop!
                 if(\%auction && !$auction{shipped_time}) {
                         push(@auctions, \%auction);
@@ -486,29 +508,41 @@ sub finished_auctions {
 
   	}
         # now sort the array
+        $main::lxdebug->message("SORT ARRAY");
 	my @ordered_auctions = sort { $b->{paid_time} <=> $a->{paid_time} } @auctions;
 
+        $main::lxdebug->message("CREATE FORM");
   	$form->{title} = $locale->text('Finished Auctions') . "&nbsp\;" . $call->nodeContent( 'timestamp' ) . "&nbsp\;<div align=right>#" . $call->nodeContent( 'totalEntries' ) . "</div>";
   	$form->header();
   	print $form->parse_html_template("auction/finished_auctions", { "TITLE" => $form->{title}, "AUCTIONS" => \@ordered_auctions });
+        $main::lxdebug->leave_sub(2);
   } else {
   	$form->{title} = $locale->text('Finished Auctions') . "&nbsp\;" . $call->nodeContent( 'timestamp' ) . "&nbsp\;<div align=right>#" . $call->nodeContent( 'totalEntries' ) . "</div>";
   	$form->header();
   	print $form->parse_html_template("auction/finished_auctions", { "TITLE" => $form->{title}, "MESSAGE" => "No running auctions found." });
   }
 ###
-  $main::lxdebug->leave_sub();
-  
+  1;
+  } or do {                      
+# catch
+        $main::lxdebug->message("EXCEPTION: " . $@);
+        print("EXCEPTION: " . $@ . "\n");
+	print STDERR "EXCEPTION: $@\n";
+  };
+  $main::lxdebug->leave_sub(1); 
 }
 
 
 
 sub ebay_gallery_url {
   my($itemID) = @_;
-  my $account = SL::AuctionAccount->retrieve('id' => 0);
   my $username;         
   my $auth_token;
   my $hard_expiration_time;
+  if(!$account) {
+	$account = SL::AuctionAccount->retrieve('id' => 0);
+  }	
+
   if($account && $account->{username} && $account->{auth_token}) {
         # get data              
         $username = $account->{username};
